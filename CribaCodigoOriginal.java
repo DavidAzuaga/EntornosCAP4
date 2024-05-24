@@ -1,62 +1,83 @@
 package ENTORNOS;
+
 import java.util.Scanner;
 
-public class CribaCodigoOriginal {
-    // Generar números primos de 1 a max
-    public static int[] generarPrimos(int max) {
-        int i, j;
-        if (max >= 2) {
-// Declaraciones
-            int dim = max + 1; // Tamaño del array
-            boolean[] esPrimo = new boolean[dim];
-// Inicializar el array
-            for (i = 0; i < dim; i++)
-                esPrimo[i] = true;
-// Eliminar el 0 y el 1, que no son primos
-            esPrimo[0] = esPrimo[1] = false;
-// Criba
-            for (i = 2; i < Math.sqrt(dim) + 1; i++) {
-                if (esPrimo[i]) {
-// Eliminar los múltiplos de i
-                    for (j = 2 * i; j < dim; j += i)
-                        esPrimo[j] = false;
-                }
-            }
-// ¿Cuántos primos hay?
-            int cuenta = 0;
-            for (i = 0; i < dim; i++) {
-                if (esPrimo[i])
-                    cuenta++;
-            }
-// Rellenar el vector de números primos
-            int[] primos = new int[cuenta];
+public class CribaRefactorizado {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Introduce el número para la criba de Erastótenes:");
+        int numeroIntroducido = sc.nextInt();
+        int[] vector = new int[numeroIntroducido];
+        System.out.println("\nVector inicial hasta: " + numeroIntroducido);
+        imprimirArrayVector(vector);
+        vector = generarPrimos(numeroIntroducido);
+        System.out.println("\nVector de primos hasta: " + numeroIntroducido);
+        imprimirVectoresPrimos(vector);
+    }
 
-            for (i = 0, j = 0; i < dim; i++) {
-                if (esPrimo[i])
-                    primos[j++] = i;
-            }
-            return primos;
-        } else { // max < 2
-            return new int[0];
-// Vector vacío
+    public static int[] generarPrimos(int numeroIntroducido) {
+        if (numeroIntroducido < 2) {
+            return new int[0]; //Si el número es menor que 2, se devolvemos un vector vacío
+        }
+
+        int tamanoArray = numeroIntroducido + 1; //Definimos el tamaño del array
+        boolean[] esNumeroPrimo = new boolean[tamanoArray];
+        int[] listaNumerosPrimos;
+
+        iniciarArray(esNumeroPrimo);
+        realizarCriba(tamanoArray, esNumeroPrimo);
+        listaNumerosPrimos = rellenarPrimos(esNumeroPrimo, tamanoArray);
+        return listaNumerosPrimos;
+    }
+
+    private static int[] rellenarPrimos(boolean[] esNumeroPrimo, int tamanoArray) {
+        int[] listaNumerosPrimos;
+        int contadorPrimos = 0;
+        for (boolean b : esNumeroPrimo) { //Contamos los números primos
+            if (b) contadorPrimos++;
+        }
+        listaNumerosPrimos = new int[contadorPrimos]; //Rellenamos el array con los números primos
+        for (int i = 0, j = 0; i < tamanoArray; i++) {
+            if (esNumeroPrimo[i]) listaNumerosPrimos[j++] = i;
+        }
+        return listaNumerosPrimos;
+    }
+
+    private static void realizarCriba(int tamanoArray, boolean[] esNumeroPrimo) {
+        for (int i = 2; i < Math.sqrt(tamanoArray) + 1; i++) {
+            eliminarMultiplos(tamanoArray, esNumeroPrimo, i);
         }
     }
 
-    public static void main(String[] args) {
-        Scanner teclado = new Scanner(System.in);
-        System.out.println("Introduce el número para la criba de Erastótenes:");
-        int dato = teclado.nextInt();
-        int vector[] = new int[dato];
-        System.out.println("\nVector inicial hasta :" + dato);
-        for (int i = 0; i < vector.length; i++) {
-            if (i % 10 == 0) System.out.println();
-            System.out.print(i + 1 + "\t");
+    private static void eliminarMultiplos(int tamanoArray, boolean[] esNumeroPrimo, int i) {
+        if (esNumeroPrimo[i]) {
+            for (int j = 2 * i; j < tamanoArray; j += i)
+                esNumeroPrimo[j] = false;
         }
-        vector = generarPrimos(dato);
-        System.out.println("\nVector de primos hasta:" + dato);
+    }
+
+    private static void iniciarArray(boolean[] esNumeroPrimo) {
+        int i;
+        for (i = 0; i < esNumeroPrimo.length; i++)
+            esNumeroPrimo[i] = true;
+        esNumeroPrimo[0] = esNumeroPrimo[1] = false;
+    }
+
+    private static void imprimirVectoresPrimos(int[] vector) {
         for (int i = 0; i < vector.length; i++) {
-            if (i % 10 == 0) System.out.println();
+            imprimirEnGruposdeDiez(i);
             System.out.print(vector[i] + "\t");
         }
+    }
+
+    private static void imprimirArrayVector(int[] vector) {
+        for (int i = 0; i < vector.length; i++) {
+            imprimirEnGruposdeDiez(i);
+            System.out.print(i + 1 + "\t");
+        }
+    }
+
+    private static void imprimirEnGruposdeDiez(int i) {
+        if (i % 10 == 0) System.out.println();
     }
 }
